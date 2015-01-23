@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	_ "tomato"
+	_ "github.com/ymotongpoo/tomato/monitor"
 )
 
 func main() {
