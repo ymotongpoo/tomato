@@ -36,7 +36,7 @@ func FetchBBSMenu() (io.Reader, error) {
 	return resp.Body, nil
 }
 
-func ParseBBSManu(r io.Reader) ([]Category, error) {
+func ParseBBSManu(r io.Reader) ([]Board, error) {
 	rInUTF8 := transform.NewReader(r, japanese.ShiftJIS.NewDecoder())
 	root, err := xmlpath.ParseHTML(rInUTF8)
 	if err != nil {

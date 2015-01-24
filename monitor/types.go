@@ -2,18 +2,11 @@ package monitor
 
 import "time"
 
-// Category is a set of boards.
-type Category struct {
-	Title     string
-	Boardlist []*Board
-}
-
 // Board is a set of threads.
 type Board struct {
 	Title      string
 	URL        string
 	Threadlist []*Thread
-	Category   *Category
 }
 
 // Thread
@@ -22,6 +15,7 @@ type Thread struct {
 	URL         string
 	Comments    []Comment
 	LastUpdated time.Time
+	Board       *Board
 }
 
 // Comment
