@@ -19,6 +19,8 @@ var BBSMenu = []string{
 	`http://azlucky.s25.xrea.com/2chboard/bbsmenu.html`,
 }
 
+var boardPath = xmlpath.MustCompile(`//font[@size="2"]/a`)
+
 // FetchBBSMenu returns
 func FetchBBSMenu() (io.Reader, error) {
 	var resp *http.Response
@@ -36,13 +38,20 @@ func FetchBBSMenu() (io.Reader, error) {
 	return resp.Body, nil
 }
 
+// ParseBBSManu parase BBS Menu data stored in r in ShiftJIS.
 func ParseBBSManu(r io.Reader) ([]Board, error) {
 	rInUTF8 := transform.NewReader(r, japanese.ShiftJIS.NewDecoder())
 	root, err := xmlpath.ParseHTML(rInUTF8)
 	if err != nil {
 		return nil, err
 	}
-	// TODO(ymotongpoo): implement here.
-	_ = root
-	return nil, nil // mock
+	iter := boardPath.Iter(root)
+
+	boards := []Board{}
+	for iter.Next() {
+		n := iter.Node()
+		// TODO(ymotognpoo): implement logic to extract link to each board and board title.
+		_ = n
+	}
+	return boards, nil // mock
 }
