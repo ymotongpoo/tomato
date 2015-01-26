@@ -4,13 +4,12 @@ import (
 	"io"
 	"net/http"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 	"gopkg.in/xmlpath.v2"
 )
 
 const (
-	UserAgent = "Monazilla/1.00 (Tomato/0.0.1)"
+	UserAgent   = "Monazilla/1.00 (Tomato/0.0.1)"
+	SubjectFile = "subject.txt"
 )
 
 var BBSMenu = []string{
@@ -40,8 +39,7 @@ func FetchBBSMenu() (io.Reader, error) {
 
 // ParseBBSMenu parase BBS Menu data stored in r in ShiftJIS.
 func ParseBBSMenu(r io.Reader) ([]Board, error) {
-	rInUTF8 := transform.NewReader(r, japanese.ShiftJIS.NewDecoder())
-	root, err := xmlpath.ParseHTML(rInUTF8)
+	root, err := xmlpath.ParseHTML(r)
 	if err != nil {
 		return nil, err
 	}
@@ -62,4 +60,9 @@ func ParseBBSMenu(r io.Reader) ([]Board, error) {
 		boards = append(boards, b)
 	}
 	return boards, nil
+}
+
+// ParseThreadList read subject.txt and make a list of thread in b.
+func (b Board) ParseThreadList(io.Reader) error {
+	return nil // mock
 }
