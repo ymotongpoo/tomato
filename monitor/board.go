@@ -2,7 +2,6 @@ package monitor
 
 import (
 	"io"
-	"log"
 	"net/http"
 
 	"golang.org/x/text/encoding/japanese"
@@ -49,11 +48,10 @@ func ParseBBSMenu(r io.Reader) ([]Board, error) {
 	iter := boardPath.Iter(root)
 
 	boards := []Board{}
-	alink := xmlpath.MustCompile(`/@href`)
-	atext := xmlpath.MustCompile(`/text()`)
+	alink := xmlpath.MustCompile(`@href`)
+	atext := xmlpath.MustCompile(`text()`)
 	for iter.Next() {
 		n := iter.Node()
-		log.Println(n.String())
 		b := Board{}
 		if s, ok := alink.String(n); ok {
 			b.URL = s
@@ -63,5 +61,5 @@ func ParseBBSMenu(r io.Reader) ([]Board, error) {
 		}
 		boards = append(boards, b)
 	}
-	return boards, nil // mock
+	return boards, nil
 }
