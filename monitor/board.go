@@ -1,8 +1,11 @@
 package monitor
 
 import (
+	"bufio"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"gopkg.in/xmlpath.v2"
 )
@@ -37,7 +40,8 @@ func FetchBBSMenu() (io.Reader, error) {
 	return resp.Body, nil
 }
 
-// ParseBBSMenu parase BBS Menu data stored in r in ShiftJIS.
+// ParseBBSMenu parase BBS Menu data stored in r. Data stored in r are expected to be UTF-8,
+// so decode 2ch's default encoding (ShiftJIS) in advance.
 func ParseBBSMenu(r io.Reader) ([]Board, error) {
 	root, err := xmlpath.ParseHTML(r)
 	if err != nil {
@@ -62,7 +66,29 @@ func ParseBBSMenu(r io.Reader) ([]Board, error) {
 	return boards, nil
 }
 
-// ParseThreadList read subject.txt and make a list of thread in b.
-func (b Board) ParseThreadList(io.Reader) error {
-	return nil // mock
+// ParseThreadlist read subject.txt and make a list of thread in b.
+// Data stored in r is expected to be UTF-8.
+func (b *Board) ParseThreadlist(r io.Reader) error {
+	br := bufio.NewReader(r)
+	var err error
+	for {
+		line, err := br.ReadString('\n')
+		if err != nil {
+			break
+		}
+		pairs := strings.SplitN(line, "<>", 2)
+		if len(pairs) != 2 {
+			return fmt.Errorf("Wrongly formatted data: %v", line)
+		}
+		t := &Thread{
+			Title: strings.TrimSpace(pairs[1]),
+			URL:   b.URL + pairs[0],
+			Board: b,
+		}
+		b.Threadlist = append(b.Threadlist, t)
+	}
+	if err != io.EOF {
+		return err
+	}
+	return nil
 }

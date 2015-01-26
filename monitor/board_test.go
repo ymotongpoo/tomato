@@ -25,3 +25,25 @@ func TestParseBBSMenu(t *testing.T) {
 		}
 	}
 }
+
+func TestParseThreadlist(t *testing.T) {
+	file, err := os.Open("data/subject.txt")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	rInUTF8 := transform.NewReader(file, japanese.ShiftJIS.NewDecoder())
+	b := &Board{
+		Title: "ニュース速報",
+		URL:   "http://hayabusa3.2ch.net/news/",
+	}
+	err = b.ParseThreadlist(rInUTF8)
+	if err != nil {
+		t.Errorf("ParseThreadlist had error: %v", err)
+	}
+	if len(b.Threadlist) == 0 {
+		t.Errorf("No thread parsed.")
+	}
+	for i, thread := range b.Threadlist {
+		t.Logf("%v: %v --> %v", i, thread.Title, thread.URL)
+	}
+}
