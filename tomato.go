@@ -3,9 +3,16 @@ package main
 import (
 	"fmt"
 
-	_ "github.com/ymotongpoo/tomato/monitor"
+	"github.com/ymotongpoo/tomato/monitor"
 )
 
 func main() {
-	fmt.Pritln("hello")
+	r, err := monitor.FetchBBSMenu()
+	if err != nil {
+		panic(err)
+	}
+	boards, err := monitor.ParseBBSMenu(r)
+	for i, b := range boards {
+		fmt.Printf("%v: %v\t%v\n", i, b.Title, b.URL)
+	}
 }

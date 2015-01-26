@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"io"
+	"log"
 	"net/http"
 
 	"golang.org/x/text/encoding/japanese"
@@ -38,8 +39,8 @@ func FetchBBSMenu() (io.Reader, error) {
 	return resp.Body, nil
 }
 
-// ParseBBSManu parase BBS Menu data stored in r in ShiftJIS.
-func ParseBBSManu(r io.Reader) ([]Board, error) {
+// ParseBBSMenu parase BBS Menu data stored in r in ShiftJIS.
+func ParseBBSMenu(r io.Reader) ([]Board, error) {
 	rInUTF8 := transform.NewReader(r, japanese.ShiftJIS.NewDecoder())
 	root, err := xmlpath.ParseHTML(rInUTF8)
 	if err != nil {
@@ -48,10 +49,19 @@ func ParseBBSManu(r io.Reader) ([]Board, error) {
 	iter := boardPath.Iter(root)
 
 	boards := []Board{}
+	alink := xmlpath.MustCompile(`/@href`)
+	atext := xmlpath.MustCompile(`/text()`)
 	for iter.Next() {
 		n := iter.Node()
-		// TODO(ymotognpoo): implement logic to extract link to each board and board title.
-		_ = n
+		log.Println(n.String())
+		b := Board{}
+		if s, ok := alink.String(n); ok {
+			b.URL = s
+		}
+		if s, ok := atext.String(n); ok {
+			b.Title = s
+		}
+		boards = append(boards, b)
 	}
 	return boards, nil // mock
 }
