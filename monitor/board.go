@@ -35,7 +35,7 @@ func HTTPGet(urlStr string, gzipped bool) (*http.Response, error) {
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 	resp, err := http.DefaultClient.Do(req)
-	if gzipped {
+	if strings.Contains(resp.Header.Get("Content-Encoding"), "gzip") {
 		r, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			return resp, err
