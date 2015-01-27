@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"bufio"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,14 +25,24 @@ var BBSMenu = []string{
 var boardPath = xmlpath.MustCompile(`//font[@size="2"]/a`)
 
 // HTTPGet call HTTP GET method to urlStr with custom header recommended to access 2ch.
-func HTTPGet(urlStr string) (*http.Response, error) {
+func HTTPGet(urlStr string, gzipped bool) (*http.Response, error) {
 	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("User-Agent", UserAgent)
-	//req.Header.Set("Accept-Encoding", "gzip")
-	return http.DefaultClient.Do(req)
+	if gzipped {
+		req.Header.Set("Accept-Encoding", "gzip")
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if gzipped {
+		r, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return resp, err
+		}
+		resp.Body = r
+	}
+	return resp, err
 }
 
 // FetchBBSMenu returns
@@ -39,7 +50,7 @@ func FetchBBSMenu() (io.Reader, error) {
 	var resp *http.Response
 	var err error
 	for _, m := range BBSMenu {
-		resp, err = HTTPGet(m)
+		resp, err = HTTPGet(m, true)
 		if err != nil {
 			continue
 		}
