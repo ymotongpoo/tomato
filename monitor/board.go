@@ -23,12 +23,23 @@ var BBSMenu = []string{
 
 var boardPath = xmlpath.MustCompile(`//font[@size="2"]/a`)
 
+// HTTPGet call HTTP GET method to urlStr with custom header recommended to access 2ch.
+func HTTPGet(urlStr string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", UserAgent)
+	//req.Header.Set("Accept-Encoding", "gzip")
+	return http.DefaultClient.Do(req)
+}
+
 // FetchBBSMenu returns
 func FetchBBSMenu() (io.Reader, error) {
 	var resp *http.Response
 	var err error
 	for _, m := range BBSMenu {
-		resp, err = http.Get(m)
+		resp, err = HTTPGet(m)
 		if err != nil {
 			continue
 		}
