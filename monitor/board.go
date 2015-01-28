@@ -48,6 +48,9 @@ func HTTPGet(urlStr string, gzipped bool) (*http.Response, error) {
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return resp, err
+	}
 	if strings.Contains(resp.Header.Get("Content-Encoding"), "gzip") {
 		r, err := gzip.NewReader(resp.Body)
 		if err != nil {
@@ -106,7 +109,6 @@ func ParseBBSMenu(r io.Reader) ([]*Board, error) {
 
 // FetchThreadlist returns
 func (b *Board) FetchThreadlist() (io.Reader, error) {
-	fmt.Println(*b)
 	resp, err := HTTPGet(b.URL+SubjectFile, true)
 	if err != nil {
 		return nil, err

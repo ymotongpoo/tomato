@@ -26,11 +26,13 @@ func main() {
 		tr, err := b.FetchThreadlist()
 		if err != nil {
 			log.Printf("error on fetching threadlist of %v: %v", b.URL, err)
+			continue
 		}
 		trInUTF8 := transform.NewReader(tr, japanese.ShiftJIS.NewDecoder())
 		err = b.ParseThreadlist(trInUTF8)
 		if err != nil {
 			log.Printf("error on parsing threadlist of %v: %v", b.URL, err)
+			continue
 		}
 		for _, t := range b.Threadlist {
 			fmt.Printf("%v: %v -> %v\n", b.Title, t.Title, t.URL)
