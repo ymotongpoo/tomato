@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
@@ -21,8 +22,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for i, b := range boards {
-		fmt.Printf("%v: %v\t%v\n", i, b.Title, b.URL)
+	for _, b := range boards {
+		tr, err := b.FetchThreadlist()
+		if err != nil {
+			log.Printf("error on fetching threadlist of %v: %v", b.URL, err)
+		}
+		trInUTF8 := transform.NewReader(tr, japanese.ShiftJIS.NewDecoder())
+		err = b.ParseThreadlist(trInUTF8)
+		if err != nil {
+			log.Printf("error on parsing threadlist of %v: %v", b.URL, err)
+		}
+		for _, t := range b.Threadlist {
+			fmt.Printf("%v: %v -> %v\n", b.Title, t.Title, t.URL)
+		}
+		time.Sleep(3 * time.Second)
 	}
-	log.Println("end")
 }

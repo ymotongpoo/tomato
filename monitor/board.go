@@ -22,6 +22,19 @@ var BBSMenu = []string{
 	`http://azlucky.s25.xrea.com/2chboard/bbsmenu.html`,
 }
 
+var BoardURLException = map[string]bool{
+	"http://www.2ch.net/":             true,
+	"http://info.2ch.net/":            true,
+	"http://irc.2ch.net:9090":         true,
+	"http://search.2ch.net/":          true,
+	"http://dig.2ch.net/":             true,
+	"http://i.2ch.net/":               true,
+	"http://www.2ch.net/kakolog.html": true,
+	"http://notice.2ch.net/":          true,
+	"http://be.2ch.net/":              true, // NOTE(ymotongpoo): need additional implmentation to login.
+	"http://2ch.tora3.net/":           true,
+}
+
 var boardPath = xmlpath.MustCompile(`//font[@size="2"]/a`)
 
 // HTTPGet call HTTP GET method to urlStr with custom header recommended to access 2ch.
@@ -64,28 +77,41 @@ func FetchBBSMenu() (io.Reader, error) {
 
 // ParseBBSMenu parase BBS Menu data stored in r. Data stored in r are expected to be UTF-8,
 // so decode 2ch's default encoding (ShiftJIS) in advance.
-func ParseBBSMenu(r io.Reader) ([]Board, error) {
+func ParseBBSMenu(r io.Reader) ([]*Board, error) {
 	root, err := xmlpath.ParseHTML(r)
 	if err != nil {
 		return nil, err
 	}
 	iter := boardPath.Iter(root)
 
-	boards := []Board{}
+	boards := []*Board{}
 	alink := xmlpath.MustCompile(`@href`)
 	atext := xmlpath.MustCompile(`text()`)
 	for iter.Next() {
 		n := iter.Node()
 		b := Board{}
 		if s, ok := alink.String(n); ok {
+			if BoardURLException[s] {
+				continue
+			}
 			b.URL = s
 		}
 		if s, ok := atext.String(n); ok {
 			b.Title = s
 		}
-		boards = append(boards, b)
+		boards = append(boards, &b)
 	}
 	return boards, nil
+}
+
+// FetchThreadlist returns
+func (b *Board) FetchThreadlist() (io.Reader, error) {
+	fmt.Println(*b)
+	resp, err := HTTPGet(b.URL+SubjectFile, true)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body, nil
 }
 
 // ParseThreadlist read subject.txt and make a list of thread in b.
