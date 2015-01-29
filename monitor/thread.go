@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 )
 
 func (t *Thread) FetchDatData(w io.Writer) error {
@@ -35,10 +36,11 @@ func (t *Thread) ParseDatData(r io.Reader) error {
 			return fmt.Errorf("comment data is broken: %v", line)
 		}
 		dateIDBE := strings.Split(contents[2], " ")
+		datetime := t.convert2chTime(dateIDBE[0] + " " + dateIDBE[1])
 		c := Comment{
 			Name:    contents[0],
 			Email:   contents[1],
-			Date:    dateIDBE[0] + " " + dateIDBE[1],
+			Date:    datetime,
 			ID:      strings.TrimPrefix(dateIDBE[2], "ID:"),
 			Content: contents[3],
 		}
@@ -48,4 +50,15 @@ func (t *Thread) ParseDatData(r io.Reader) error {
 		return err
 	}
 	return nil
+}
+
+func (t *Thread) convert2chTime(datetime string) time.Time {
+	loc, _ := time.LoadLocation("Asia/Tokyo")
+	if datetime == "あぼーん" {
+		return time.Date(1900, 1, 1, 0, 0, 0, 0, loc)
+	}
+	i := strings.Index(datetime, "(")
+	j := strings.Index(datetime, ")")
+	parsed, _ := time.ParseInLocation("2006/01/02 15:04:05.00", datetime[:i]+" "+datetime[j+1:], loc)
+	return parsed
 }
