@@ -12,7 +12,9 @@ import (
 )
 
 func main() {
-	log.Println("start")
+	log.Println("**** process start")
+
+	log.Println("**** parsing BBSMenu")
 	r, err := monitor.FetchBBSMenu()
 	if err != nil {
 		panic(err)
@@ -22,6 +24,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println("**** parsing threadlist of each boards")
 	for _, b := range boards {
 		tr, err := b.FetchThreadlist()
 		if err != nil {

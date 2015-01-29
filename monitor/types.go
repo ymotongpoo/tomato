@@ -1,7 +1,5 @@
 package monitor
 
-import "time"
-
 // Board is a set of threads.
 type Board struct {
 	Title      string
@@ -14,7 +12,7 @@ type Thread struct {
 	Title       string
 	URL         string
 	Comments    []Comment
-	LastUpdated time.Time
+	LastUpdated string
 	Board       *Board
 }
 
@@ -25,5 +23,5 @@ type Comment struct {
 	Date    string
 	ID      string
 	BE      string
-	Comment string
+	Content string
 }
