@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// FetchDatData fetch dat file from specified URL and write its data to w.
 func (t *Thread) FetchDatData(w io.Writer) error {
 	resp, err := HTTPGet(t.URL, true)
 	if err != nil {

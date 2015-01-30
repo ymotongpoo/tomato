@@ -2,6 +2,19 @@ package monitor
 
 import "time"
 
+// ErrorManager holds
+type ErrorManager struct {
+	board  *Board
+	thread *Thread
+}
+
+// Manager controls
+type Manager struct {
+	boards []*Board
+	errBCh chan *Board
+	errTCh chan *Thread
+}
+
 // Board is a set of threads.
 type Board struct {
 	Title      string
