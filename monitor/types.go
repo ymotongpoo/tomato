@@ -10,9 +10,10 @@ type ErrorManager struct {
 
 // Manager controls
 type Manager struct {
-	boards []*Board
-	errBCh chan *Board
-	errTCh chan *Thread
+	datastore string
+	boards    []*Board
+	errBCh    chan *Board
+	errTCh    chan *Thread
 }
 
 // Board is a set of threads.
