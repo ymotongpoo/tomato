@@ -1,6 +1,10 @@
 package monitor
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+)
 
 var (
 	BoardCapacity  = 1000
@@ -17,12 +21,19 @@ func (e ErrorManager) Error() string {
 	return "Someting is wrong. ErrorManager should hold either of board or thread."
 }
 
-func NewManager() Manager {
-	return Manager{
-		boards: make([]*Board, BoardCapacity),
-		errBCh: make(chan *Board, BoardCapacity),
-		errTCh: make(chan *Thread, ThreadCapacity),
+// NewManager generates new Manager with datastore path.
+func NewManager() (*Manager, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
 	}
+	datastore := filepath.Join(pwd, "files")
+	return &Manager{
+		datastore: datastore,
+		boards:    make([]*Board, BoardCapacity),
+		errBCh:    make(chan *Board, BoardCapacity),
+		errTCh:    make(chan *Thread, ThreadCapacity),
+	}, nil
 }
 
 func (m Manager) Start() {

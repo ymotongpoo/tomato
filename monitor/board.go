@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"gopkg.in/xmlpath.v2"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
 const (
