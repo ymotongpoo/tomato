@@ -1,6 +1,12 @@
 package monitor
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"io"
+	"os"
+	"path/filepath"
+)
 
 var (
 	BoardCapacity  = 1000
@@ -17,16 +23,37 @@ func (e ErrorManager) Error() string {
 	return "Someting is wrong. ErrorManager should hold either of board or thread."
 }
 
-func NewManager() Manager {
-	return Manager{
-		boards: make([]*Board, BoardCapacity),
-		errBCh: make(chan *Board, BoardCapacity),
-		errTCh: make(chan *Thread, ThreadCapacity),
+// NewManager generates new Manager with datastore path.
+func NewManager() (*Manager, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
 	}
+	datastore := filepath.Join(pwd, "files")
+	return &Manager{
+		datastore: datastore,
+		boards:    make([]*Board, BoardCapacity),
+		errBCh:    make(chan *Board, BoardCapacity),
+		errTCh:    make(chan *Thread, ThreadCapacity),
+	}, nil
 }
 
 func (m Manager) Start() {
-	// TODO(ymotongpoo): Find datastore first and board data.
+	// Find datastore first and board data.
+	p := filepath.Join(m.datastore, BBSMenuFile)
+	var bbsmenu io.Reader
+	var fetcherr error
+	bbsmenu, err := os.Open(p)
+	if err != nil {
+		if err == os.ErrNotExist {
+			bbsmenu, fetcherr = FetchBBSMenu()
+			if fetcherr != nil {
+				log.Fatal(fetcherr)
+			}
+		}
+		log.Fatal(err)
+	}
+	_ = bbsmenu
 	// TODO(ymotongpoo): Fetch board data if possible and update URL if there are.
 	// TODO(ymotongpoo): Load threadlist data from datastore and check timestamp.
 	// TODO(ymotongpoo): Fetch threadlist data and update subject.txt saved.

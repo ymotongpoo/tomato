@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"strings"
 
-	"gopkg.in/xmlpath.v2"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
 const (
 	UserAgent   = "Monazilla/1.00 (Tomato/0.0.1)"
+	BBSMenuFile = "bbsmenu.html"
 	SubjectFile = "subject.txt"
 )
 
