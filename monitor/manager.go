@@ -32,7 +32,7 @@ func NewManager() (*Manager, error) {
 	datastore := filepath.Join(pwd, "files")
 	return &Manager{
 		datastore: datastore,
-		boards:    make([]*Board, BoardCapacity),
+		boards:    nil,
 		errBCh:    make(chan *Board, BoardCapacity),
 		errTCh:    make(chan *Thread, ThreadCapacity),
 	}, nil
@@ -53,8 +53,12 @@ func (m Manager) Start() {
 		}
 		log.Fatal(err)
 	}
-	_ = bbsmenu
+
 	// TODO(ymotongpoo): Fetch board data if possible and update URL if there are.
+	m.boards, err := ParseBBSMenu(bbsmenu)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// TODO(ymotongpoo): Load threadlist data from datastore and check timestamp.
 	// TODO(ymotongpoo): Fetch threadlist data and update subject.txt saved.
 	// TODO(ymotongpoo): Load thread data from datastore.
