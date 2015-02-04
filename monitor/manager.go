@@ -46,9 +46,16 @@ func (m Manager) Start() {
 	bbsmenu, err := os.Open(p)
 	if err != nil {
 		if err == os.ErrNotExist {
+			file, err := os.Create(p)
+			if err != nil {
+				log.Fatal(err)
+			}
 			bbsmenu, fetcherr = FetchBBSMenu()
 			if fetcherr != nil {
 				log.Fatal(fetcherr)
+			}
+			if _, err := io.Copy(file, bbsmenu); err != nil {
+				log.Fatal(err)
 			}
 		}
 		log.Fatal(err)
