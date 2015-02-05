@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"golang.org/x/net/html/charset"
 )
 
 var (
@@ -61,12 +63,19 @@ func (m Manager) Start() {
 		log.Fatal(err)
 	}
 
-	// TODO(ymotongpoo): Fetch board data if possible and update URL if there are.
-	m.boards, err := ParseBBSMenu(bbsmenu)
+	r, err := charset.NewReader(bbsmenu, "text/html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Fetch board data if possible and update URL if there are.
+	// TODO(ymotongpoo): confirm file timestamp and last updated header of the bbsmenu.
+	m.boards, err = ParseBBSMenu(r)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// TODO(ymotongpoo): Load threadlist data from datastore and check timestamp.
+
 	// TODO(ymotongpoo): Fetch threadlist data and update subject.txt saved.
 	// TODO(ymotongpoo): Load thread data from datastore.
 	// TODO(ymotongpoo): Fetch thread data. Be sure to range update using if-modified-since header.
