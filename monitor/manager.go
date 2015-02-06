@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"golang.org/x/net/html/charset"
 )
@@ -74,7 +75,28 @@ func (m Manager) Start() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// TODO(ymotongpoo): Load threadlist data from datastore and check timestamp.
+	for _, b := range m.boards {
+		tr, err := b.FetchThreadlist()
+		if err != nil {
+			log.Printf("error on fetching threadlist of %v: %v", b.URL, err)
+			continue
+		}
+		trInUTF8, err := charset.NewReader(tr, "text/plain")
+		if err != nil {
+			log.Println(err)
+		}
+		err = b.ParseThreadlist(trInUTF8)
+		if err != nil {
+			log.Printf("error on parsing threadlist of %v: %v", b.URL, err)
+			continue
+		}
+		for _, t := range b.Threadlist {
+			fmt.Printf("%v: %v -> %v\n", b.Title, t.Title, t.URL)
+		}
+		time.Sleep(3 * time.Second)
+	}
 
 	// TODO(ymotongpoo): Fetch threadlist data and update subject.txt saved.
 	// TODO(ymotongpoo): Load thread data from datastore.
