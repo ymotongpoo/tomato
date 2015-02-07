@@ -33,6 +33,10 @@ func NewManager() (*Manager, error) {
 		return nil, err
 	}
 	datastore := filepath.Join(pwd, "files")
+	err = os.Mkdir(datastore, 0755)
+	if err != nil && !os.IsExist(err) {
+		return nil, err
+	}
 	return &Manager{
 		datastore: datastore,
 		boards:    nil,
@@ -48,20 +52,17 @@ func (m Manager) Start() {
 	var fetcherr error
 	bbsmenu, err := os.Open(p)
 	if err != nil {
-		if err == os.ErrNotExist {
-			file, err := os.Create(p)
-			if err != nil {
-				log.Fatal(err)
-			}
-			bbsmenu, fetcherr = FetchBBSMenu()
-			if fetcherr != nil {
-				log.Fatal(fetcherr)
-			}
-			if _, err := io.Copy(file, bbsmenu); err != nil {
-				log.Fatal(err)
-			}
+		file, err := os.Create(p)
+		if err != nil {
+			log.Fatal("file creation:", err)
 		}
-		log.Fatal(err)
+		bbsmenu, fetcherr = FetchBBSMenu()
+		if fetcherr != nil {
+			log.Fatal(fetcherr)
+		}
+		if _, err := io.Copy(file, bbsmenu); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	r, err := charset.NewReader(bbsmenu, "text/html")
@@ -97,8 +98,4 @@ func (m Manager) Start() {
 		}
 		time.Sleep(3 * time.Second)
 	}
-
-	// TODO(ymotongpoo): Fetch threadlist data and update subject.txt saved.
-	// TODO(ymotongpoo): Load thread data from datastore.
-	// TODO(ymotongpoo): Fetch thread data. Be sure to range update using if-modified-since header.
 }
