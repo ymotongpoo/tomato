@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	
+
 	xmlpath "gopkg.in/xmlpath.v2"
 )
 
@@ -24,6 +24,7 @@ var BBSMenu = []string{
 }
 
 var BoardURLException = map[string]bool{
+	"http://jp.8ch.net/":              true,
 	"http://www.2ch.net/":             true,
 	"http://info.2ch.net/":            true,
 	"http://irc.2ch.net:9090":         true,

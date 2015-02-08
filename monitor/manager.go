@@ -74,11 +74,12 @@ func (m Manager) Start() {
 	// TODO(ymotongpoo): confirm file timestamp and last updated header of the bbsmenu.
 	m.boards, err = ParseBBSMenu(r)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Parse: ", err)
 	}
 
 	// TODO(ymotongpoo): Load threadlist data from datastore and check timestamp.
 	for _, b := range m.boards {
+		log.Printf("%v: %v", b.Title, b.URL)
 		tr, err := b.FetchThreadlist()
 		if err != nil {
 			log.Printf("error on fetching threadlist of %v: %v", b.URL, err)
@@ -86,7 +87,7 @@ func (m Manager) Start() {
 		}
 		trInUTF8, err := charset.NewReader(tr, "text/plain")
 		if err != nil {
-			log.Println(err)
+			log.Println("NewReader:", err)
 		}
 		err = b.ParseThreadlist(trInUTF8)
 		if err != nil {
