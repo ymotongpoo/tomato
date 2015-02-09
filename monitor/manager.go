@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 var (
@@ -85,7 +87,8 @@ func (m Manager) Start() {
 			log.Printf("error on fetching threadlist of %v: %v", b.URL, err)
 			continue
 		}
-		trInUTF8, err := charset.NewReader(tr, "text/plain")
+
+		trInUTF8 := transform.NewReader(tr, japanese.ShiftJIS.NewDecoder()) // TODO(ymotongpoo): find more generic way.
 		if err != nil {
 			log.Println("NewReader:", err)
 		}
