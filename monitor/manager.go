@@ -2,8 +2,8 @@ package monitor
 
 import (
 	"fmt"
-	"log"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"time"

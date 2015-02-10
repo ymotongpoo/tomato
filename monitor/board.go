@@ -134,7 +134,7 @@ func (b *Board) ParseThreadlist(r io.Reader) error {
 		}
 		t := &Thread{
 			Title: strings.TrimSpace(pairs[1]),
-			URL:   b.URL + "/dat/" + pairs[0],
+			URL:   b.URL + "dat/" + pairs[0],
 			Board: b,
 		}
 		b.Threadlist = append(b.Threadlist, t)
